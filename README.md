@@ -1,2 +1,1 @@
-Log
-  Completed the register file (Feb 6 2020)
+Completed the register file (Feb 6 2020)
