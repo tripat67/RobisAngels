@@ -1,3 +1,4 @@
+// old code - master file (keep it, dont make any changes - make branches)
 module register_file (en, addr, din, rst, sa, sb, clk, da, db);
 
 	output [63:0] da, db;  // data to function unit
