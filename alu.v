@@ -20,8 +20,6 @@ module alu (dataA, dataB, fs, c0, out, status);
 			111 - unused
 	*/
 	
-	
-	
 	wire z, n, c, v;								// zero, negative, carry out, overflow
 	wire [63:0]inA, inB;							// mux input to adder
 	wire [63:0]a, o, x, add, lsl, lsr;		// AND out, OR out, XOR out, ADD out, LSL out, LSR out
@@ -34,18 +32,18 @@ module alu (dataA, dataB, fs, c0, out, status);
 	assign z = (out == 64'b0) ? 1'b1 : 1'b0;
 	assign v = ~(inA[63] ^ inB[63]) & (out[63] ^ inA[63]);
 	
-	and and0 (a, inA, inB);
-	or  or0  (o, inA, inB);
-	xor xor0 (x, inA, inB);
+	assign a = inA & inB;
+	assign o = inA | inB;
+	assign x = inA ^ inB;
 	
 	adder   add1   (inA, inB, c0, add, c);
 	shifter shift1 (dataA, dataB[5:0], lsl, lsr);
 	
-	mux8_1 (out, fs[4:2], a, o, add, x, lsl, lsr, 64'b0, 64'b0;)
+	mux8_1 function_select (out, fs[4:2], a, o, add, x, lsl, lsr, 64'b0, 64'b0);
 	
 endmodule 
 
-// 64-bit 2 to 1 mux
+/* 64-bit 2 to 1 mux
 module mux2_1 (out, s, in0, in1);
 	output [63:0]out;
 	input  [63:0]in0, in1;
@@ -54,6 +52,7 @@ module mux2_1 (out, s, in0, in1);
 	assign out = s ? in1 : in0;
 
 endmodule 
+*/
 
 // 64-bit 8 to 1 mux
 module mux8_1 (out, s, in0, in1, in2, in3, in4, in5, in6, in7);
