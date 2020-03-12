@@ -1,4 +1,9 @@
+# Datapath
+#
 # ALU: Done 
-# Register: Done
-# Datapath: 
-# Ram: Done
+# Register: Done 
+# RAM: Done
+# ROM: 
+# PC: 
+# Control Unit: 
+
