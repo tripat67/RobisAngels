@@ -1,70 +1,29 @@
 module datapath_tb ();
-	wire [63:0] f;
-	wire [63:0] d;
-	wire [3:0]  status;						
-	reg  [63:0] k;								
-	reg  [4:0]  addrR, addrA, addrB;	
-	reg  [4:0]  fs;							
-	reg  sd, sb;								
-	reg  s;
-	reg  w, clk, rst;						
-	reg  c0;	
+	wire [4:0] status;
+	reg [63:0] k;
+	reg [4:0] reg_addr;
+	reg [4:0] a_addr;
+	reg [4:0] b_addr;
+	reg [4:0] fs;
+	reg reg_w;
+	reg b_sel;
+	reg b_en;
+	reg alu_en;
+	reg mem_en;
+	reg chip_sel;
+	reg mem_w;
+	reg mem_r;
+	reg stat_en;
+	reg c0;
+	reg rst;
+	reg clk;
+	
+	wire [63:0] R0, R1, R2, R3, R4, R5, R6, R7;
+	wire [63:0] d, f;
 
-	wire [63:0] R0, R1,  R3, R5, R20, R21, R22, R23;
-
-	alu_reg dut (f, d, status, k, fs, addrR, addrA, addrB, s, sd, sb, c0, w, clk, rst);
+	datapath dut (status, k, reg_addr, a_addr, b_addr, fs, reg_w, b_sel, b_en, alu_en, mem_en, chip_sel, mem_w, mem_r, stat_en, c0, rst, clk);
 	
-	initial begin
-		k <= 64'd0;
-		addrR <= 5'b00000;
-		addrA <= 5'b00000;
-		addrB <= 5'b00000;
-		fs <= 5'b01000;
-		sd <= 1'b0;
-		sb <= 1'b0;
-		s <= 1'b0;
-		w <= 1'b0;
-		clk <= 1'b0;
-		rst <= 1'b0;
-		c0 <= 1'b0;
-	end
-	
-	always #1 clk <= ~clk;
-	
-	always begin
-		// pulse rst
-		#1 rst <= 1'b1;
-		#1 rst <= 1'b0;
-		
-		// load registers
-		#1 k <= 64'd916;
-		#1 addrR <= 5'd0;
-		#1 s <= 1'b1;
-		#1 sd <= 1'b1;
-		#1 addrA <= 5'd31;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
-		
-		#1 k <= 64'd619;
-		#1 addrR <= 5'd1;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
-		
-		#1 k <= 64'b01010111;
-		#1 addrR <= 5'd3;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
-		
-		#1 k <= 64'b111;
-		#1 addrR <= 5'd5;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
-		
-		#1 s <= 1'b0;
-		
-		// math time
-		
-		/* 
+	/* 
 		function select inputs
 		fs[0] - invert dataB
 		fs[1] - invert dataA
@@ -78,42 +37,58 @@ module datapath_tb ();
 			110 - unused
 			111 - unused
 	*/
+	
+	initial begin 
+		k <= 64'd0;
+		reg_addr <= 5'b0;
+		a_addr <= 5'b0;
+		b_addr <= 5'b0;
+		fs <= 5'b01000;
+		reg_w <= 1'b0;
+		b_sel <= 1'b0;
+		b_en <= 1'b0;
+		alu_en <= 1'b0;
+		mem_en <= 1'b0;
+		chip_sel <= 1'b0;
+		mem_w <= 1'b0;
+		mem_r <= 1'b0;
+		stat_en <= 1'b0;
+		c0 <= 1'b0;
+		rst <= 1'b1;
+		clk <= 1'b0;
+	end
+	
+	always #5 clk <= ~clk;
+	
+	always begin
+		#1  rst <= 1'b0;
+		#1  a_addr <= 5'd31;
+		#1  {reg_w, b_sel, alu_en} <= 3'b111;
+		#1  {reg_addr, k} <= {5'd0, 64'd2};
+		#10 {reg_addr, k} <= {5'd1, 64'd5};
+		#10 {reg_addr, k} <= {5'd2, 64'b1010};
+		#10 {reg_addr, k} <= {5'd3, 64'b1001};
 		
-		#1 fs <= 5'b01000;
-		#1 addrR <= 5'd20;
-		#1 addrA <= 5'd0;
-		#1 addrB <= 5'd1;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
+		#1  b_sel <= 1'b0;
 		
-		#1 fs <= 5'b00000;
-		#1 addrR <= 5'd21;
-		#1 addrA <= 5'd3;
-		#1 addrB <= 5'd5;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
+		#9  {reg_addr, a_addr, b_addr, fs, c0} <= {5'd4, 5'd0, 5'd1, 5'b01000, 1'b0};
+		#10 {reg_addr, a_addr, b_addr, fs, c0} <= {5'd5, 5'd0, 5'd1, 5'b01010, 1'b1};
+		#10 {reg_addr, a_addr, b_addr, fs, c0} <= {5'd6, 5'd2, 5'd3, 5'b00000, 1'b0};
+		#10 {reg_addr, a_addr, b_sel, k, fs} <= {5'd7, 5'd3, 1'b1, 64'd1, 5'b10000};
 		
-		#1 fs <= 5'b10000;
-		#1 addrR <= 5'd22;
-		#1 addrA <= 5'd5;
-		#1 k <= 64'd3;
-		#1 s <= 1'b1;
-		#1 w <= 1'b1;
-		#3 w <= 1'b0;
-		#1 s <= 1'b0;
-		
-		
-		
-		#1 $stop;
+		#10 $stop;
 	end
 	
 	assign R0 = dut.R0;
 	assign R1 = dut.R1;
+	assign R2 = dut.R2;
 	assign R3 = dut.R3;
+	assign R4 = dut.R4;
 	assign R5 = dut.R5;
-	assign R20 = dut.R20;
-	assign R21 = dut.R21;
-	assign R22 = dut.R22;
-	assign R23 = dut.R23;
-
+	assign R6 = dut.R6;
+	assign R7 = dut.R7;
+	
+	assign d = dut.d;
+	assign f = dut.f;
+	
 endmodule 

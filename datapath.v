@@ -24,10 +24,17 @@ module datapath (status, k, reg_addr, a_addr, b_addr, fs, reg_w, b_sel, b_en, al
 	wire [63:0] mux_out;									// output of b mux
 	wire [63:0]	mem_out;									// memory output
 	
+	wire [31:0] pc_in;									// program counter input
+	wire [31:0] pc_out;									// program counter output
+	
 	wire [7:0] mem_addr;									// memory address
 	
 	wire [3:0] alu_stat;									// alu status output {v, c, v, z}
 	wire [3:0] stored_stat;								// status in register
+	
+	wire [1:0] ps;											// program counter select: hold, increment, load, offset
+	
+	wire pc_sel;											// pc mux select
 	
 	assign status = {stored_stat, alu_stat[0]};	// 5-bit status bus
 	
@@ -36,6 +43,7 @@ module datapath (status, k, reg_addr, a_addr, b_addr, fs, reg_w, b_sel, b_en, al
 	assign d = chip_sel ? mem_out : 64'bz;			// memory output tristate buffer
 	
 	assign mux_out = b_sel ? k : dataB;				// b mux
+	assign pc_in = pc_sel ? k : dataA;				// pc mux
 	
 	wire [63:0] R0, R1, R2, R3, R4, R5, R6, R7;
 
