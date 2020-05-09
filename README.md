@@ -3,7 +3,7 @@
 # ALU: Done 
 # Register: Done 
 # RAM: Done
-# ROM: 
-# PC: 
-# Control Unit: 
+# ROM: Done
+# PC: Done
+# Control Unit: Done
 
